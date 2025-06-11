@@ -21,7 +21,12 @@
   );
 }
 .message-text-content { 
-    text-align: start;
+    text-align: start !important;
+}
+.code-block{
+    text-align: start !important;
+    margin: 1rem auto;
+    max-width: 90%;
 }
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -345,15 +350,22 @@ body {
 }
 
 .message-text pre {
-  margin: 1rem 0;
+  margin: 1rem auto;
   border-radius: 8px;
   overflow: hidden;
+  background: #1E1E1E;
+  border: 1px solid #333;
+  padding: 1rem;
+  text-align: start !important;
+  font-family: 'Consolas', 'Monaco', monospace;
+  max-width: 90%;
 }
 
 .message-text code {
   font-family: 'Fira Code', 'Consolas', monospace;
   font-size: 0.9rem;
   line-height: 1.5;
+  text-align: start !important;
 }
 
 .message-text p {
@@ -372,6 +384,7 @@ body {
 .message-text pre > div {
   margin: 0 !important;
   border-radius: 8px !important;
+  text-align: start !important;
 }
 
 /* Inline code */
@@ -380,6 +393,7 @@ body {
   padding: 0.2em 0.4em;
   border-radius: 4px;
   font-size: 0.9em;
+  text-align: start;
 }
 
 /* Code block language label */
@@ -484,27 +498,53 @@ body {
   animation: pulse 1.5s infinite;
 }
 
-/* Typing indicator animation */
+/* Typing Animation */
+.message-wrapper.bot .message-content {
+    position: relative;
+}
+
+.message-wrapper.bot .message-text {
+    display: inline-block;
+    overflow: hidden;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.message-wrapper.bot .message-text.typing {
+    animation: typewriter 0.1s steps(1, end);
+}
+
+@keyframes typewriter {
+    from {
+        clip-path: inset(0 100% 0 0);
+    }
+    to {
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+/* Keep existing typing indicator styles */
 .typing-indicator {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
 }
 
 .typing-indicator .dot {
-  width: 8px;
-  height: 8px;
-  background: rgba(22, 171, 255, 0.8);
-  border-radius: 50%;
-  animation: typing 1.4s infinite;
+    width: 8px;
+    height: 8px;
+    background: rgba(22, 171, 255, 0.8);
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
 }
 
 .typing-indicator .dot:nth-child(2) {
-  animation-delay: 0.2s;
+    animation-delay: 0.2s;
 }
 
 .typing-indicator .dot:nth-child(3) {
-  animation-delay: 0.4s;
+    animation-delay: 0.4s;
 }
 
 @keyframes typing {
@@ -516,4 +556,110 @@ body {
     transform: translateY(-4px);
     opacity: 1;
   }
+}
+
+/* Markdown Headers */
+.message-text h1,
+.message-text h2,
+.message-text h3,
+.message-text h4,
+.message-text h5,
+.message-text h6 {
+    color: #16abff;
+    margin: 1.5rem 0 1rem 0;
+    font-weight: 600;
+    text-align: start;
+}
+
+.message-text h1 { font-size: 1.8rem; }
+.message-text h2 { font-size: 1.5rem; }
+.message-text h3 { font-size: 1.3rem; }
+.message-text h4 { font-size: 1.1rem; }
+.message-text h5 { font-size: 1rem; }
+.message-text h6 { font-size: 0.9rem; }
+
+/* Lists */
+.message-text ul,
+.message-text ol {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+    text-align: start;
+}
+
+.message-text li {
+    margin: 0.5rem 0;
+    line-height: 1.6;
+}
+
+.message-text ul li {
+    list-style-type: '•';
+    padding-left: 0.5rem;
+}
+
+.message-text ul li::marker {
+    color: #16abff;
+}
+
+.message-text ol {
+    counter-reset: item;
+}
+
+.message-text ol li {
+    counter-increment: item;
+    list-style-type: none;
+    position: relative;
+}
+
+.message-text ol li::before {
+    content: counter(item) ".";
+    color: #16abff;
+    position: absolute;
+    left: -1.5rem;
+    font-weight: 500;
+}
+
+/* Code Block Actions */
+.code-block {
+    position: relative;
+    text-align: start;
+    margin: 1rem auto;
+    max-width: 90%;
+}
+
+.code-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    gap: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 2;
+}
+
+.code-block:hover .code-actions {
+    opacity: 1;
+}
+
+.code-action-button {
+    background: rgba(22, 171, 255, 0.1);
+    border: 1px solid rgba(22, 171, 255, 0.2);
+    color: #16abff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.code-action-button:hover {
+    background: rgba(22, 171, 255, 0.2);
+    border-color: rgba(22, 171, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+.code-action-button.copied {
+    background: rgba(22, 171, 255, 0.2);
+    color: #fff;
 }
