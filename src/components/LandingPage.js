@@ -3,11 +3,16 @@ import './LandingPage.css';
 
 const LandingPage = () => {
   const [messages, setMessages] = useState([
-    { sender: 'bot', text: 'Welcome to ThreatIntel. How can I assist you today?' }
+    { sender: 'bot', text: 'Welcome to ThreatIntel AI. How can I assist you today?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [conversationId, setConversationId] = useState(null);
   const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    startNewChat();
+  }, []);
 
   const handleSend = async () => {
     if (!input.trim()) return;
@@ -18,12 +23,15 @@ const LandingPage = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:3001/api/chat', {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ 
+          message: userMessage,
+          conversationId: conversationId
+        }),
       });
 
       const data = await response.json();
@@ -48,9 +56,79 @@ const LandingPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const startNewChat = () => {
-    setMessages([{ sender: 'bot', text: 'Welcome to ThreatIntel. How can I assist you today?' }]);
-    setInput('');
+  const startNewChat = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat/new`, {
+        method: 'POST',
+      });
+      const data = await response.json();
+      setConversationId(data.conversationId);
+      setMessages([{ sender: 'bot', text: 'Welcome to ThreatIntel AI. How can I assist you today?' }]);
+      setInput('');
+    } catch (error) {
+      console.error('Error starting new chat:', error);
+    }
+  };
+
+  const renderMessage = (text) => {
+    const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
+
+    while ((match = codeBlockRegex.exec(text)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push({
+          type: 'text',
+          content: text.slice(lastIndex, match.index)
+        });
+      }
+      
+      parts.push({
+        type: 'code',
+        language: match[1] || 'text',
+        content: match[2]
+      });
+      
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < text.length) {
+      parts.push({
+        type: 'text',
+        content: text.slice(lastIndex)
+      });
+    }
+
+    if (parts.length === 0) {
+      parts.push({ type: 'text', content: text });
+    }
+
+    return parts.map((part, index) => {
+      if (part.type === 'code') {
+        return (
+          <pre key={index} className="code-block">
+            <code className={`language-${part.language}`}>
+              {part.content}
+            </code>
+          </pre>
+        );
+      } else {
+        let formattedText = part.content
+          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+          .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
+          .replace(/`(.*?)`/g, '<code class="inline-code">$1</code>') // Inline code
+          .replace(/\n/g, '<br />'); // Line breaks
+
+        return (
+          <div 
+            key={index} 
+            className="message-text-content"
+            dangerouslySetInnerHTML={{ __html: formattedText }}
+          />
+        );
+      }
+    });
   };
 
   return (
@@ -66,24 +144,32 @@ const LandingPage = () => {
           </button>
         </div>
         <div className="chat-history">
-          {/* Chat history items can be added here */}
+          {}
         </div>
       </div>
 
       <div className="main-content">
         <div className="chat-container">
-          <div className={`messages-container ${messages.length > 1 ? 'show-scrollbar' : ''}`}>
+          <div className="messages-container">
             {messages.map((msg, i) => (
               <div key={i} className={`message-wrapper ${msg.sender}`}>
                 <div className="message-content">
-                  <div className="message-text">{msg.text}</div>
+                  <div className="message-text">
+                    {renderMessage(msg.text)}
+                  </div>
                 </div>
               </div>
             ))}
             {isLoading && (
               <div className="message-wrapper bot">
-                <div className="message-content">
-                  <div className="message-text">Thinking...</div>
+                <div className="message-content loading">
+                  <div className="message-text">
+                    <span className="typing-indicator">
+                      <span className="dot"></span>
+                      <span className="dot"></span>
+                      <span className="dot"></span>
+                    </span>
+                  </div>
                 </div>
               </div>
             )}
