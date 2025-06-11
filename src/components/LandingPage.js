@@ -167,11 +167,7 @@ const LandingPage = () => {
               <div className="message-wrapper bot">
                 <div className="message-content loading">
                   <div className="message-text">
-                    <span className="typing-indicator">
-                      <span className="dot"></span>
-                      <span className="dot"></span>
-                      <span className="dot"></span>
-                    </span>
+                    <span className="typing-dots">...</span>
                   </div>
                 </div>
               </div>
