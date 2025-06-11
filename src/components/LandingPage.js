@@ -136,7 +136,10 @@ const LandingPage = () => {
       <div className="sidebar">
         <div className="sidebar-header">
           <div className="logo-container">
-            <img src="/logo.png" alt="ThreatIntel Logo" className="logo" />
+            <div className="logo-icon">T</div>
+            <div className="logo-text">
+              ThreatIntel <span>AI</span>
+            </div>
           </div>
           <button className="new-chat-button" onClick={startNewChat}>
             <span className="plus-icon">+</span>
