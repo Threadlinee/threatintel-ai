@@ -9,6 +9,7 @@ const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState(null);
   const messagesEndRef = useRef(null);
+  const [showAppearance, setShowAppearance] = useState(false);
 
   useEffect(() => {
     startNewChat();
@@ -132,6 +133,39 @@ const LandingPage = () => {
     });
   };
 
+  const setTheme = (theme) => {
+    const root = document.documentElement;
+    switch (theme) {
+      case 'indigo-mint':
+        root.style.setProperty('--primary-color', '#4B0082');
+        root.style.setProperty('--accent-color', '#98FF98');
+        root.style.setProperty('--background-color', '#1C1C1C');
+        break;
+      case 'teal-gold':
+        root.style.setProperty('--primary-color', '#008080');
+        root.style.setProperty('--accent-color', '#FFD700');
+        root.style.setProperty('--background-color', '#191970');
+        break;
+      case 'slate-cyan':
+        root.style.setProperty('--primary-color', '#2E3A59');
+        root.style.setProperty('--accent-color', '#00FFFF');
+        root.style.setProperty('--background-color', '#F8F9FA');
+        break;
+      case 'purple-sky':
+        root.style.setProperty('--primary-color', '#6A0DAD');
+        root.style.setProperty('--accent-color', '#87CEEB');
+        root.style.setProperty('--background-color', '#C0C0C0');
+        break;
+      case 'dark-green-ivory':
+        root.style.setProperty('--primary-color', '#014421');
+        root.style.setProperty('--accent-color', '#FFFFF0');
+        root.style.setProperty('--background-color', '#B87333');
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <div className="app-container">
       <div className="sidebar">
@@ -150,6 +184,19 @@ const LandingPage = () => {
         <div className="chat-history">
           {}
         </div>
+        <div className="sidebar-section" onClick={() => setShowAppearance(!showAppearance)} style={{ cursor: 'pointer', padding: '16px 0', textAlign: 'center' }}>
+          <span role="img" aria-label="appearance">🎨</span> Appearance
+        </div>
+        {showAppearance && (
+          <div className="sidebar-section" style={{ padding: '12px', background: 'rgba(255,255,255,0.07)', borderRadius: '10px', margin: '0 16px 16px 16px' }}>
+            <div style={{ marginBottom: '8px' }}>Choose a theme:</div>
+            <button className="theme-button" onClick={() => setTheme('indigo-mint')}>Indigo + Mint Green + Charcoal</button>
+            <button className="theme-button" onClick={() => setTheme('teal-gold')}>Teal + Soft Gold + Midnight Blue</button>
+            <button className="theme-button" onClick={() => setTheme('slate-cyan')}>Slate Gray + Neon Cyan + White</button>
+            <button className="theme-button" onClick={() => setTheme('purple-sky')}>Purple + Sky Blue + Silver</button>
+            <button className="theme-button" onClick={() => setTheme('dark-green-ivory')}>Dark Green + Ivory + Copper</button>
+          </div>
+        )}
       </div>
 
       <div className="main-content">
