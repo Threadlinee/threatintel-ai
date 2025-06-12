@@ -115,6 +115,7 @@ const LandingPage = () => {
         );
       } else {
         let formattedText = part.content
+          .replace(/^### (.*)$/gm, '<strong>$1</strong>') // Convert ### headers to bold
           .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
           .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
           .replace(/`(.*?)`/g, '<code class="inline-code">$1</code>') // Inline code
