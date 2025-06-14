@@ -46,7 +46,6 @@ const LandingPage = () => {
       localStorage.setItem('allMessages', JSON.stringify(allMessages));
     }
   }, [chatHistory, allMessages]);
-  console.log(process.env.REACT_APP_BASE_URL) 
   const startNewChat = async () => {
     setIsLoading(true);
     try {
