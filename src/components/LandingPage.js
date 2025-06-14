@@ -50,9 +50,7 @@ const LandingPage = () => {
   const startNewChat = async () => {
     setIsLoading(true);
     try {
-      // const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat/new`, { method: 'POST' });
-      const response = await fetch(`/api/chat/new`, { method: 'POST' });
-
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat/new`, { method: 'POST' });
       const data = await response.json();
       
       const newChat = { id: data.conversationId, title: 'New Chat' };
@@ -109,9 +107,7 @@ const LandingPage = () => {
     }
     
     try {
-      // const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat`, {
-        const response = await fetch(`/api/chat`, {
-
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: userMessage, conversationId: activeConversationId }),
