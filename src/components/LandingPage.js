@@ -2,25 +2,32 @@ import React, { useState, useEffect, useRef } from 'react';
 import './LandingPage.css';
 
 const LandingPage = () => {
-  const [messages, setMessages] = useState([
-    { sender: 'bot', text: 'Welcome to ThreatIntel AI. How can I assist you today?' }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [conversationId, setConversationId] = useState(null);
   const messagesEndRef = useRef(null);
   const [showAppearance, setShowAppearance] = useState(false);
 
+  const examplePrompts = [
+    'What are the most common web application vulnerabilities?',
+    'Explain the MITRE ATT&CK framework.',
+    'Write a python script to scan for open ports on a host.',
+    'How does a DDoS attack work and how can it be mitigated?'
+  ];
+
   useEffect(() => {
     startNewChat();
   }, []);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handleSend = async (messageToSend) => {
+    const userMessage = messageToSend || input;
+    if (!userMessage.trim()) return;
 
-    const userMessage = input;
     setMessages(prev => [...prev, { sender: 'user', text: userMessage }]);
-    setInput('');
+    if (!messageToSend) {
+      setInput('');
+    }
     setIsLoading(true);
 
     try {
@@ -64,7 +71,7 @@ const LandingPage = () => {
       });
       const data = await response.json();
       setConversationId(data.conversationId);
-      setMessages([{ sender: 'bot', text: 'Welcome to ThreatIntel AI. How can I assist you today?' }]);
+      setMessages([{ sender: 'bot', text: data.greeting }]);
       setInput('');
     } catch (error) {
       console.error('Error starting new chat:', error);
@@ -216,11 +223,25 @@ const LandingPage = () => {
                 </div>
               </div>
             ))}
+            {messages.length === 1 && !isLoading && (
+              <div className="welcome-enhancements">
+                <div className="example-prompts">
+                  {examplePrompts.map((prompt, i) => (
+                    <div key={i} className="prompt-card" onClick={() => handleSend(prompt)}>
+                      <h4>{prompt}</h4>
+                      <p>Click to send this prompt</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             {isLoading && (
               <div className="message-wrapper bot">
-                <div className="message-content loading">
-                  <div className="message-text">
-                    <span className="typing-dots">...</span>
+                <div className="message-content">
+                  <div className="typing-indicator">
+                    <span className="dot"></span>
+                    <span className="dot"></span>
+                    <span className="dot"></span>
                   </div>
                 </div>
               </div>
@@ -238,7 +259,7 @@ const LandingPage = () => {
                   type="text"
                   value={input}
                   onChange={e => setInput(e.target.value)}
-                  placeholder="Ask anything..."
+                  placeholder="Ask anything about cybersecurity..."
                   className="message-input"
                   disabled={isLoading}
                 />
