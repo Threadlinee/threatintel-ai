@@ -206,31 +206,54 @@ const LandingPage = () => {
 
   const setTheme = (theme) => {
     const root = document.documentElement;
+    // Reset to default Phind-like theme first
+    root.style.setProperty('--primary-slate', '#2E3A59');
+    root.style.setProperty('--accent-cyan', '#00FFFF');
+    root.style.setProperty('--background-light', '#F8F9FA');
+    root.style.setProperty('--background-white', '#FFFFFF');
+    root.style.setProperty('--text', '#2E3A59');
+    root.style.setProperty('--text-light', '#F8F9FA');
+    root.style.setProperty('--border', '#E5E7EB');
+
     switch (theme) {
       case 'indigo-mint':
-        root.style.setProperty('--primary-color', '#4B0082');
-        root.style.setProperty('--accent-color', '#98FF98');
-        root.style.setProperty('--background-color', '#1C1C1C');
+        root.style.setProperty('--primary-slate', '#4B0082'); // indigo
+        root.style.setProperty('--accent-cyan', '#98FF98'); // mint
+        root.style.setProperty('--background-light', '#1C1C1C'); // charcoal
+        root.style.setProperty('--background-white', '#2A2A2A');
+        root.style.setProperty('--text', '#E0E0E0');
+        root.style.setProperty('--text-light', '#FFFFFF');
+        root.style.setProperty('--border', '#444444');
         break;
       case 'teal-gold':
-        root.style.setProperty('--primary-color', '#008080');
-        root.style.setProperty('--accent-color', '#FFD700');
-        root.style.setProperty('--background-color', '#191970');
+        root.style.setProperty('--primary-slate', '#008080'); // teal
+        root.style.setProperty('--accent-cyan', '#FFD700'); // gold
+        root.style.setProperty('--background-light', '#191970'); // midnight blue
+        root.style.setProperty('--background-white', '#242482');
+        root.style.setProperty('--text', '#E0E0E0');
+        root.style.setProperty('--text-light', '#FFFFFF');
+        root.style.setProperty('--border', '#3A3A9A');
         break;
-      case 'slate-cyan':
-        root.style.setProperty('--primary-color', '#2E3A59');
-        root.style.setProperty('--accent-color', '#00FFFF');
-        root.style.setProperty('--background-color', '#F8F9FA');
+      case 'slate-cyan': // This is the default theme
+        // Already reset above, so no need to do anything here
         break;
       case 'purple-sky':
-        root.style.setProperty('--primary-color', '#6A0DAD');
-        root.style.setProperty('--accent-color', '#87CEEB');
-        root.style.setProperty('--background-color', '#C0C0C0');
+        root.style.setProperty('--primary-slate', '#6A0DAD'); // purple
+        root.style.setProperty('--accent-cyan', '#87CEEB'); // sky blue
+        root.style.setProperty('--background-light', '#F0F0F0'); // silver-ish light
+        root.style.setProperty('--background-white', '#FFFFFF');
+        root.style.setProperty('--text', '#333333');
+        root.style.setProperty('--text-light', '#FFFFFF');
+        root.style.setProperty('--border', '#DCDCDC');
         break;
       case 'dark-green-ivory':
-        root.style.setProperty('--primary-color', '#014421');
-        root.style.setProperty('--accent-color', '#FFFFF0');
-        root.style.setProperty('--background-color', '#B87333');
+        root.style.setProperty('--primary-slate', '#014421'); // dark green
+        root.style.setProperty('--accent-cyan', '#FFFFF0'); // ivory
+        root.style.setProperty('--background-light', '#B87333'); // copper
+        root.style.setProperty('--background-white', '#C88343');
+        root.style.setProperty('--text', '#FFFFFF');
+        root.style.setProperty('--text-light', '#FFFFFF');
+        root.style.setProperty('--border', '#A86323');
         break;
       default:
         break;
@@ -269,12 +292,14 @@ const LandingPage = () => {
             </div>
           ))}
         </div>
-        <div className="sidebar-section" onClick={() => setShowAppearance(!showAppearance)} style={{ cursor: 'pointer', padding: '16px 0', textAlign: 'center' }}>
-          <span role="img" aria-label="appearance">��</span> Appearance
+        <div className="sidebar-section">
+          <div className="appearance-toggle" onClick={() => setShowAppearance(!showAppearance)}>
+            <span role="img" aria-label="appearance">🎨</span> Appearance
+          </div>
         </div>
         {showAppearance && (
-          <div className="sidebar-section" style={{ padding: '12px', background: 'rgba(255,255,255,0.07)', borderRadius: '10px', margin: '0 16px 16px 16px' }}>
-            <div style={{ marginBottom: '8px' }}>Choose a theme:</div>
+          <div className="appearance-modal">
+            <div className="appearance-modal-header">Choose a theme:</div>
             <button className="theme-button" onClick={() => setTheme('indigo-mint')}>Indigo + Mint Green + Charcoal</button>
             <button className="theme-button" onClick={() => setTheme('teal-gold')}>Teal + Soft Gold + Midnight Blue</button>
             <button className="theme-button" onClick={() => setTheme('slate-cyan')}>Slate Gray + Neon Cyan + White</button>
