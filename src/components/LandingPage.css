@@ -16,6 +16,10 @@
   --text-light: #F8F9FA;
   --border: #E5E7EB;
   --primary-glow: rgba(0, 255, 255, 0.15);
+  /* New variables for code blocks */
+  --code-bg-container: #F0F2F5;
+  --code-bg-header: #E8EBF0;
+  --code-text-header: #6c757d;
 }
 
 body {
@@ -300,13 +304,13 @@ body {
   border-radius: 12px;
   margin: 16px 0;
   overflow: hidden; /* To clip the children to the border-radius */
-  background: #F0F2F5; /* A slightly different background for the whole block */
+  background: var(--code-bg-container);
 }
 
 .code-block-header {
-  background-color: #E8EBF0;
+  background-color: var(--code-bg-header);
   padding: 8px 16px;
-  color: #6c757d;
+  color: var(--code-text-header);
   font-size: 13px;
   font-family: 'Consolas', 'Monaco', monospace;
   border-bottom: 1px solid var(--border);

@@ -214,6 +214,9 @@ const LandingPage = () => {
     root.style.setProperty('--text', '#2E3A59');
     root.style.setProperty('--text-light', '#F8F9FA');
     root.style.setProperty('--border', '#E5E7EB');
+    root.style.setProperty('--code-bg-container', '#F0F2F5');
+    root.style.setProperty('--code-bg-header', '#E8EBF0');
+    root.style.setProperty('--code-text-header', '#6c757d');
 
     switch (theme) {
       case 'indigo-mint':
@@ -224,6 +227,9 @@ const LandingPage = () => {
         root.style.setProperty('--text', '#E0E0E0');
         root.style.setProperty('--text-light', '#FFFFFF');
         root.style.setProperty('--border', '#444444');
+        root.style.setProperty('--code-bg-container', '#252525');
+        root.style.setProperty('--code-bg-header', '#333333');
+        root.style.setProperty('--code-text-header', '#AAAAAA');
         break;
       case 'teal-gold':
         root.style.setProperty('--primary-slate', '#008080'); // teal
@@ -233,6 +239,9 @@ const LandingPage = () => {
         root.style.setProperty('--text', '#E0E0E0');
         root.style.setProperty('--text-light', '#FFFFFF');
         root.style.setProperty('--border', '#3A3A9A');
+        root.style.setProperty('--code-bg-container', '#1F1F7A');
+        root.style.setProperty('--code-bg-header', '#2A2A9A');
+        root.style.setProperty('--code-text-header', '#AABBDD');
         break;
       case 'slate-cyan': // This is the default theme
         // Already reset above, so no need to do anything here
@@ -245,6 +254,9 @@ const LandingPage = () => {
         root.style.setProperty('--text', '#333333');
         root.style.setProperty('--text-light', '#FFFFFF');
         root.style.setProperty('--border', '#DCDCDC');
+        root.style.setProperty('--code-bg-container', '#EAEAEA');
+        root.style.setProperty('--code-bg-header', '#DDDDDD');
+        root.style.setProperty('--code-text-header', '#555555');
         break;
       case 'dark-green-ivory':
         root.style.setProperty('--primary-slate', '#014421'); // dark green
@@ -254,6 +266,9 @@ const LandingPage = () => {
         root.style.setProperty('--text', '#FFFFFF');
         root.style.setProperty('--text-light', '#FFFFFF');
         root.style.setProperty('--border', '#A86323');
+        root.style.setProperty('--code-bg-container', '#A06529');
+        root.style.setProperty('--code-bg-header', '#805020');
+        root.style.setProperty('--code-text-header', '#EEDDCC');
         break;
       default:
         break;
