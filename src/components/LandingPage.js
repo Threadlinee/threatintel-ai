@@ -2,13 +2,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import './LandingPage.css';
 
 const LandingPage = () => {
-  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [conversationId, setConversationId] = useState(null);
-  const messagesEndRef = useRef(null);
   const [showAppearance, setShowAppearance] = useState(false);
 
+  // --- State for multi-chat management ---
+  const [chatHistory, setChatHistory] = useState([]);
+  const [allMessages, setAllMessages] = useState({});
+  const [activeConversationId, setActiveConversationId] = useState(null);
+
+  const messagesEndRef = useRef(null);
+  
   const examplePrompts = [
     'What are the most common web application vulnerabilities?',
     'Explain the MITRE ATT&CK framework.',
@@ -16,44 +20,113 @@ const LandingPage = () => {
     'How does a DDoS attack work and how can it be mitigated?'
   ];
 
+  // Load from localStorage on initial render
   useEffect(() => {
-    startNewChat();
+    try {
+      const savedHistory = JSON.parse(localStorage.getItem('chatHistory'));
+      const savedMessages = JSON.parse(localStorage.getItem('allMessages'));
+
+      if (savedHistory && savedMessages && savedHistory.length > 0) {
+        setChatHistory(savedHistory);
+        setAllMessages(savedMessages);
+        setActiveConversationId(savedHistory[0].id);
+      } else {
+        startNewChat();
+      }
+    } catch (error) {
+      console.error("Failed to load from localStorage", error);
+      startNewChat();
+    }
   }, []);
+
+  // Save to localStorage whenever history or messages change
+  useEffect(() => {
+    if (chatHistory.length > 0 && Object.keys(allMessages).length > 0) {
+      localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+      localStorage.setItem('allMessages', JSON.stringify(allMessages));
+    }
+  }, [chatHistory, allMessages]);
+  
+  const startNewChat = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat/new`, { method: 'POST' });
+      const data = await response.json();
+      
+      const newChat = { id: data.conversationId, title: 'New Chat' };
+      
+      setChatHistory(prev => [newChat, ...prev]);
+      setAllMessages(prev => ({ ...prev, [data.conversationId]: [{ sender: 'bot', text: data.greeting }] }));
+      setActiveConversationId(data.conversationId);
+    } catch (error) {
+      console.error('Error starting new chat:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+  const selectChat = (id) => {
+    setActiveConversationId(id);
+  };
+  
+  const deleteChat = (idToDelete) => {
+    const remainingChats = chatHistory.filter(chat => chat.id !== idToDelete);
+    setChatHistory(remainingChats);
+    
+    setAllMessages(prev => {
+      const newMessages = { ...prev };
+      delete newMessages[idToDelete];
+      return newMessages;
+    });
+
+    if (activeConversationId === idToDelete) {
+      if (remainingChats.length > 0) {
+        setActiveConversationId(remainingChats[0].id);
+      } else {
+        startNewChat();
+      }
+    }
+  };
 
   const handleSend = async (messageToSend) => {
     const userMessage = messageToSend || input;
-    if (!userMessage.trim()) return;
+    if (!userMessage.trim() || !activeConversationId) return;
 
-    setMessages(prev => [...prev, { sender: 'user', text: userMessage }]);
-    if (!messageToSend) {
-      setInput('');
-    }
+    const currentMessages = allMessages[activeConversationId] || [];
+    const newMessages = [...currentMessages, { sender: 'user', text: userMessage }];
+    setAllMessages(prev => ({ ...prev, [activeConversationId]: newMessages }));
+
+    if (!messageToSend) setInput('');
     setIsLoading(true);
 
+    if (currentMessages.filter(m => m.sender === 'user').length === 0) {
+      const newTitle = userMessage.split(' ').slice(0, 5).join(' ');
+      setChatHistory(prev => prev.map(chat => 
+        chat.id === activeConversationId ? { ...chat, title: newTitle } : chat
+      ));
+    }
+    
     try {
       const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          message: userMessage,
-          conversationId: conversationId
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage, conversationId: activeConversationId }),
       });
-
       const data = await response.json();
-      
+
       if (response.ok) {
-        setMessages(prev => [...prev, { sender: 'bot', text: data.response }]);
+        setAllMessages(prev => ({
+          ...prev,
+          [activeConversationId]: [...newMessages, { sender: 'bot', text: data.response }]
+        }));
       } else {
         throw new Error(data.error || 'Failed to get response');
       }
     } catch (error) {
-      setMessages(prev => [...prev, { 
-        sender: 'bot', 
-        text: 'Sorry, I encountered an error. Please try again.' 
-      }]);
+      setAllMessages(prev => ({
+        ...prev,
+        [activeConversationId]: [...newMessages, { sender: 'bot', text: 'Sorry, I encountered an error. Please try again.' }]
+      }));
       console.error('Error:', error);
     } finally {
       setIsLoading(false);
@@ -62,21 +135,7 @@ const LandingPage = () => {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
-
-  const startNewChat = async () => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat/new`, {
-        method: 'POST',
-      });
-      const data = await response.json();
-      setConversationId(data.conversationId);
-      setMessages([{ sender: 'bot', text: data.greeting }]);
-      setInput('');
-    } catch (error) {
-      console.error('Error starting new chat:', error);
-    }
-  };
+  }, [allMessages, activeConversationId]);
 
   const renderMessage = (text) => {
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
@@ -194,10 +253,24 @@ const LandingPage = () => {
           </button>
         </div>
         <div className="chat-history">
-          {}
+          {chatHistory.map(chat => (
+            <div 
+              key={chat.id} 
+              className={`chat-history-item ${chat.id === activeConversationId ? 'active' : ''}`}
+              onClick={() => selectChat(chat.id)}
+            >
+              <span className="chat-title">{chat.title}</span>
+              <button className="delete-chat-button" onClick={(e) => {
+                e.stopPropagation();
+                deleteChat(chat.id);
+              }}>
+                &#x2715;
+              </button>
+            </div>
+          ))}
         </div>
         <div className="sidebar-section" onClick={() => setShowAppearance(!showAppearance)} style={{ cursor: 'pointer', padding: '16px 0', textAlign: 'center' }}>
-          <span role="img" aria-label="appearance">🎨</span> Appearance
+          <span role="img" aria-label="appearance">��</span> Appearance
         </div>
         {showAppearance && (
           <div className="sidebar-section" style={{ padding: '12px', background: 'rgba(255,255,255,0.07)', borderRadius: '10px', margin: '0 16px 16px 16px' }}>
@@ -214,7 +287,7 @@ const LandingPage = () => {
       <div className="main-content">
         <div className="chat-container">
           <div className="messages-container">
-            {messages.map((msg, i) => (
+            {(allMessages[activeConversationId] || []).map((msg, i) => (
               <div key={i} className={`message-wrapper ${msg.sender}`}>
                 <div className="message-content">
                   <div className="message-text">
@@ -223,7 +296,7 @@ const LandingPage = () => {
                 </div>
               </div>
             ))}
-            {messages.length === 1 && !isLoading && (
+            {allMessages[activeConversationId] && allMessages[activeConversationId].length < 2 && !isLoading && (
               <div className="welcome-enhancements">
                 <div className="example-prompts">
                   {examplePrompts.map((prompt, i) => (
@@ -238,7 +311,7 @@ const LandingPage = () => {
             {isLoading && (
               <div className="message-wrapper bot">
                 <div className="message-content">
-                  <div className="typing-indicator">
+                  <div className="typing-indicator-inline">
                     <span className="dot"></span>
                     <span className="dot"></span>
                     <span className="dot"></span>

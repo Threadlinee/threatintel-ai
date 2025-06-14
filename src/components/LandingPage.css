@@ -10,11 +10,11 @@
 :root {
   --primary-slate: #2E3A59;
   --accent-cyan: #00FFFF;
-  --background-light: #F8F9FA; /* A very light grey for the main background */
-  --background-white: #FFFFFF; /* Pure white for message cards, inputs */
+  --background-light: #F8F9FA;
+  --background-white: #FFFFFF;
   --text: #2E3A59;
   --text-light: #F8F9FA;
-  --border: #E5E7EB; /* A lighter border color */
+  --border: #E5E7EB;
   --primary-glow: rgba(0, 255, 255, 0.15);
 }
 
@@ -41,16 +41,15 @@ body {
   background: var(--primary-slate);
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 16px 0;
   position: fixed;
   left: 0;
   top: 0;
   z-index: 10;
-  border-right: 1px solid var(--border);
 }
 
 .sidebar-header {
-  padding: 12px 0 24px 0;
+  padding: 12px 16px 24px 16px;
 }
 
 .logo-container {
@@ -80,12 +79,13 @@ body {
 }
 
 .new-chat-button {
-  width: 100%;
+  width: calc(100% - 32px);
+  margin: 0 16px;
   padding: 12px;
   background: transparent;
-  border: 1px solid var(--accent-cyan);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
-  color: var(--accent-cyan);
+  color: var(--text-light);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -97,11 +97,98 @@ body {
 }
 
 .new-chat-button:hover {
-  background: rgba(0, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .plus-icon {
   font-size: 16px;
+}
+
+.chat-history {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 0 16px;
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chat-history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, opacity 0.2s;
+  color: var(--text-light);
+  opacity: 0.7;
+}
+
+.chat-history-item:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  opacity: 1;
+}
+
+.chat-history-item.active {
+  background-color: var(--accent-cyan);
+  color: var(--primary-slate);
+  font-weight: 600;
+  opacity: 1;
+}
+
+.chat-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+  font-size: 14px;
+}
+
+.delete-chat-button {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 14px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  padding: 0 4px;
+  visibility: hidden;
+}
+
+.chat-history-item:hover .delete-chat-button {
+  opacity: 0.6;
+  visibility: visible;
+}
+
+.delete-chat-button:hover {
+  opacity: 1;
+}
+
+
+.sidebar-section {
+  padding: 16px 0;
+  margin: 0 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+  text-align: center;
+}
+
+.theme-button {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 4px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: var(--text-light);
+  border-radius: 4px;
+  cursor: pointer;
+  text-align: left;
+}
+.theme-button:hover{
+  background: rgba(255,255,255,0.2);
 }
 
 /* --- Main Content Styles --- */
@@ -249,13 +336,11 @@ body {
 .input-wrapper {
   display: flex;
   align-items: center;
-  gap: 12px;
   background: var(--background-white);
-  border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 8px;
-  transition: all 0.2s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--border);
+  padding: 6px;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .input-wrapper:focus-within {
@@ -264,37 +349,34 @@ body {
 }
 
 .message-input {
-  flex: 1;
-  background: transparent;
+  flex-grow: 1;
   border: none;
-  color: var(--primary-slate);
-  font-size: 16px;
-  padding: 10px 8px;
   outline: none;
-  resize: none;
-  height: 48px; /* Set a default height */
+  padding: 10px;
+  font-size: 16px;
+  background: transparent;
+  color: var(--text);
 }
 
 .message-input::placeholder {
-  color: #9098A9;
+  color: #828a99;
 }
 
 .send-button {
   background: var(--accent-cyan);
-  color: var(--primary-slate);
   border: none;
   border-radius: 8px;
-  padding: 10px 20px;
-  font-weight: 600;
-  font-size: 15px;
+  padding: 10px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  align-self: flex-end; /* Align to bottom if input resizes */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-slate);
+  transition: opacity 0.2s ease;
 }
 
 .send-button:hover:not(:disabled) {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
+  opacity: 0.85;
 }
 
 .send-button:disabled {
@@ -303,38 +385,34 @@ body {
 }
 
 
-/* --- Typing Indicator --- */
-.typing-indicator {
+/* --- Loading / Welcome Styles --- */
+
+.typing-indicator-inline {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 12px 16px;
-  background: var(--background-white);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  width: fit-content;
+  padding: 10px 0;
 }
 
-.typing-indicator .dot {
+.typing-indicator-inline .dot {
   width: 8px;
   height: 8px;
+  margin: 0 3px;
+  background-color: #8e8e8e;
   border-radius: 50%;
-  background-color: var(--primary-slate);
   animation: dot-bounce 1.4s infinite ease-in-out both;
 }
 
-.typing-indicator .dot:nth-child(1) { animation-delay: -0.32s; }
-.typing-indicator .dot:nth-child(2) { animation-delay: -0.16s; }
-.typing-indicator .dot:nth-child(3) { animation-delay: 0s; }
+.typing-indicator-inline .dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-indicator-inline .dot:nth-child(2) { animation-delay: -0.16s; }
+.typing-indicator-inline .dot:nth-child(3) { animation-delay: 0s; }
 
 @keyframes dot-bounce {
   0%, 80%, 100% { transform: scale(0); }
   40% { transform: scale(1.0); }
 }
 
-/* --- Welcome Enhancements --- */
 .welcome-enhancements {
-  padding: 16px 0;
+  padding: 20px 0;
 }
 
 .example-prompts {
@@ -349,45 +427,43 @@ body {
   border-radius: 12px;
   padding: 16px;
   cursor: pointer;
-  transition: all 0.2s ease-in-out;
-  text-align: left;
+  transition: all 0.2s ease;
 }
 
 .prompt-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
   border-color: var(--accent-cyan);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
 }
 
 .prompt-card h4 {
-  color: var(--primary-slate);
+  margin: 0 0 8px 0;
+  color: var(--text);
   font-size: 15px;
   font-weight: 500;
-  margin: 0 0 8px 0;
-  line-height: 1.4;
 }
 
 .prompt-card p {
-  color: #828a99;
-  font-size: 13px;
   margin: 0;
+  font-size: 14px;
+  color: #6c757d;
+  font-weight: 400;
 }
 
-/* --- Responsive Design --- */
 @media (max-width: 900px) {
   .sidebar {
-    width: 220px;
+    transform: translateX(-100%);
+    position: absolute;
   }
   .main-content {
-    margin-left: 220px;
+    margin-left: 0;
   }
 }
 
 @media (max-width: 768px) {
   .sidebar {
+    width: 100%;
     transform: translateX(-100%);
-    position: absolute;
-    /* Add transition for smooth slide-in/out if you add a toggle button */
   }
   .main-content {
     margin-left: 0;
@@ -398,4 +474,4 @@ body {
   .example-prompts {
     grid-template-columns: 1fr;
   }
-}
+} 
