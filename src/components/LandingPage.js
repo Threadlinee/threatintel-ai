@@ -300,11 +300,11 @@ const LandingPage = () => {
         {showAppearance && (
           <div className="appearance-modal">
             <div className="appearance-modal-header">Choose a theme:</div>
-            <button className="theme-button" onClick={() => setTheme('indigo-mint')}>Indigo + Mint Green + Charcoal</button>
-            <button className="theme-button" onClick={() => setTheme('teal-gold')}>Teal + Soft Gold + Midnight Blue</button>
-            <button className="theme-button" onClick={() => setTheme('slate-cyan')}>Slate Gray + Neon Cyan + White</button>
-            <button className="theme-button" onClick={() => setTheme('purple-sky')}>Purple + Sky Blue + Silver</button>
-            <button className="theme-button" onClick={() => setTheme('dark-green-ivory')}>Dark Green + Ivory + Copper</button>
+            <button className="theme-button" onClick={() => setTheme('indigo-mint')}>Charcoal</button>
+            <button className="theme-button" onClick={() => setTheme('teal-gold')}>Midnight Blue</button>
+            <button className="theme-button" onClick={() => setTheme('slate-cyan')}>Default Light</button>
+            <button className="theme-button" onClick={() => setTheme('purple-sky')}>Purple</button>
+            <button className="theme-button" onClick={() => setTheme('dark-green-ivory')}>Copper</button>
           </div>
         )}
       </div>
