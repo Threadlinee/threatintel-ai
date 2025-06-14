@@ -108,11 +108,16 @@ const LandingPage = () => {
     return parts.map((part, index) => {
       if (part.type === 'code') {
         return (
-          <pre key={index} className="code-block">
-            <code className={`language-${part.language}`}>
-              {part.content}
-            </code>
-          </pre>
+          <div key={index} className="code-block-container">
+            <div className="code-block-header">
+              <span>{part.language}</span>
+            </div>
+            <pre className="code-block">
+              <code className={`language-${part.language}`}>
+                {part.content}
+              </code>
+            </pre>
+          </div>
         );
       } else {
         let formattedText = part.content
