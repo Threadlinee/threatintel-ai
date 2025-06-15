@@ -1,33 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Filter } from 'bad-words';
 import './LandingPage.css';
+import { allExamplePrompts } from '../data/prompts';
 
-const filter = new Filter();
-
-const allExamplePrompts = [
-  'What are the most common web application vulnerabilities?',
-  'Explain the MITRE ATT&CK framework.',
-  'Write a python script to scan for open ports on a host.',
-  'How does a DDoS attack work and how can it be mitigated?',
-  'What is the difference between a virus and a worm?',
-  'Explain the concept of a Zero-Day exploit.',
-  'How can I secure my home Wi-Fi network?',
-  'Describe the process of a SQL Injection attack.',
-  'What are the key principles of cryptography?',
-  'Write a bash script to automate backups of a directory.',
-  'Explain the CIA triad in cybersecurity.',
-  'What is social engineering and give three examples.',
-  'How does ransomware work?',
-  'What is the role of a SOC analyst?',
-  'Compare and contrast symmetric and asymmetric encryption.',
-  'How to perform reconnaissance on a target domain?',
-  'What are some common cloud security misconfigurations?',
-  'Explain the concept of least privilege.',
-  'Write a PowerShell script to find all local administrator accounts.',
-  'What is digital forensics?',
-];
-
-const LandingPage = () => {
+const filter = new Filter();const LandingPage = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showAppearance, setShowAppearance] = useState(false);
