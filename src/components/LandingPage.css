@@ -429,6 +429,12 @@ body {
   cursor: not-allowed;
 }
 
+.warning-message {
+  color: #dc3545; /* A standard Bootstrap danger color */
+  font-size: 14px;
+  text-align: center;
+  margin-top: 10px;
+}
 
 /* --- Loading / Welcome Styles --- */
 

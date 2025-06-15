@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Filter } from 'bad-words';
 import './LandingPage.css';
+
+const filter = new Filter();
 
 const LandingPage = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showAppearance, setShowAppearance] = useState(false);
+  const [warningMessage, setWarningMessage] = useState('');
 
   // --- State for multi-chat management ---
   const [chatHistory, setChatHistory] = useState([]);
@@ -100,15 +104,23 @@ const LandingPage = () => {
     const userMessage = messageToSend || input;
     if (!userMessage.trim() || !activeConversationId) return;
 
+    setWarningMessage(''); // Clear previous warnings
+    let messageForDisplay = userMessage;
+
+    if (filter.isProfane(userMessage)) {
+      messageForDisplay = filter.clean(userMessage);
+      setWarningMessage('Inappropriate language detected and censored. Please be respectful.');
+    }
+
     const currentMessages = allMessages[activeConversationId] || [];
-    const newMessages = [...currentMessages, { sender: 'user', text: userMessage }];
+    const newMessages = [...currentMessages, { sender: 'user', text: messageForDisplay }];
     setAllMessages(prev => ({ ...prev, [activeConversationId]: newMessages }));
 
     if (!messageToSend) setInput('');
     setIsLoading(true);
 
     if (currentMessages.filter(m => m.sender === 'user').length === 0) {
-      const newTitle = userMessage.split(' ').slice(0, 5).join(' ');
+      const newTitle = messageForDisplay.split(' ').slice(0, 5).join(' ');
       setChatHistory(prev => prev.map(chat => 
         chat.id === activeConversationId ? { ...chat, title: newTitle } : chat
       ));
@@ -118,7 +130,7 @@ const LandingPage = () => {
       const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage, conversationId: activeConversationId }),
+        body: JSON.stringify({ message: messageForDisplay, conversationId: activeConversationId }),
       });
       const data = await response.json();
 
@@ -402,6 +414,7 @@ const LandingPage = () => {
                   </svg>
                 </button>
               </div>
+              {warningMessage && <p className="warning-message">{warningMessage}</p>}
             </form>
           </div>
         </div>
