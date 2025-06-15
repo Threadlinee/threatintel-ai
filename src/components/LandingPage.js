@@ -10,6 +10,8 @@ const LandingPage = () => {
   const [showAppearance, setShowAppearance] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
 
+  const textareaRef = useRef(null);
+
   // --- State for multi-chat management ---
   const [chatHistory, setChatHistory] = useState([]);
   const [allMessages, setAllMessages] = useState({});
@@ -157,6 +159,30 @@ const LandingPage = () => {
       console.error('Error:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      const maxHeight = 200; // Max height in pixels
+      const scrollHeight = textarea.scrollHeight;
+
+      if (scrollHeight > maxHeight) {
+        textarea.style.height = `${maxHeight}px`;
+        textarea.style.overflowY = 'auto';
+      } else {
+        textarea.style.height = `${scrollHeight}px`;
+        textarea.style.overflowY = 'hidden';
+      }
+    }
+  }, [input]);
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
     }
   };
 
@@ -395,13 +421,15 @@ const LandingPage = () => {
               handleSend();
             }}>
               <div className="input-wrapper">
-                <input
-                  type="text"
+                <textarea
+                  ref={textareaRef}
                   value={input}
                   onChange={e => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   placeholder="Ask anything about cybersecurity..."
                   className="message-input"
                   disabled={isLoading}
+                  rows={1}
                 />
                 <button 
                   type="submit" 
