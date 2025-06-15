@@ -50,6 +50,9 @@ const LandingPage = () => {
     setIsLoading(true);
     try {
       const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat/new`, { method: 'POST' });
+      if (!response.ok) {
+        throw new Error('Connection failed: Could not start a new chat. Please ensure the backend server is running correctly.');
+      }
       const data = await response.json();
       
       const newChat = { id: data.conversationId, title: 'New Chat' };
@@ -59,6 +62,12 @@ const LandingPage = () => {
       setActiveConversationId(data.conversationId);
     } catch (error) {
       console.error('Error starting new chat:', error);
+      const errorId = `error_${Date.now()}`;
+      const errorMessage = `Failed to start a new chat. Please ensure the backend server is running.`;
+      const newChat = { id: errorId, title: 'Connection Error' };
+      setChatHistory(prev => [newChat, ...prev]);
+      setAllMessages(prev => ({ ...prev, [errorId]: [{ sender: 'bot', text: errorMessage }] }));
+      setActiveConversationId(errorId);
     } finally {
       setIsLoading(false);
     }
@@ -119,12 +128,19 @@ const LandingPage = () => {
           [activeConversationId]: [...newMessages, { sender: 'bot', text: data.response }]
         }));
       } else {
-        throw new Error(data.error || 'Failed to get response');
+        throw new Error(data.error || 'Failed to get response from server.');
       }
     } catch (error) {
+       let friendlyMessage = error.message;
+      if (error.message.toLowerCase().includes('authentication failure')) {
+        friendlyMessage = 'Authentication Error: The APIsss key is invalid or missing. Please check the .env file in the backend directory.';
+      } else if (error.message.toLowerCase().includes('failed to fetch')) {
+        friendlyMessage = 'Connection Error: Unable to connect to the backend server. Please make sure it is running.';
+      }
+      
       setAllMessages(prev => ({
         ...prev,
-        [activeConversationId]: [...newMessages, { sender: 'bot', text: 'Sorry, I encountered an error. Please try again.' }]
+        [activeConversationId]: [...newMessages, { sender: 'bot', text: `Error: ${friendlyMessage}` }]
       }));
       console.error('Error:', error);
     } finally {
