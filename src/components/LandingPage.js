@@ -4,6 +4,29 @@ import './LandingPage.css';
 
 const filter = new Filter();
 
+const allExamplePrompts = [
+  'What are the most common web application vulnerabilities?',
+  'Explain the MITRE ATT&CK framework.',
+  'Write a python script to scan for open ports on a host.',
+  'How does a DDoS attack work and how can it be mitigated?',
+  'What is the difference between a virus and a worm?',
+  'Explain the concept of a Zero-Day exploit.',
+  'How can I secure my home Wi-Fi network?',
+  'Describe the process of a SQL Injection attack.',
+  'What are the key principles of cryptography?',
+  'Write a bash script to automate backups of a directory.',
+  'Explain the CIA triad in cybersecurity.',
+  'What is social engineering and give three examples.',
+  'How does ransomware work?',
+  'What is the role of a SOC analyst?',
+  'Compare and contrast symmetric and asymmetric encryption.',
+  'How to perform reconnaissance on a target domain?',
+  'What are some common cloud security misconfigurations?',
+  'Explain the concept of least privilege.',
+  'Write a PowerShell script to find all local administrator accounts.',
+  'What is digital forensics?',
+];
+
 const LandingPage = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -16,16 +39,10 @@ const LandingPage = () => {
   const [chatHistory, setChatHistory] = useState([]);
   const [allMessages, setAllMessages] = useState({});
   const [activeConversationId, setActiveConversationId] = useState(null);
+  const [displayedPrompts, setDisplayedPrompts] = useState([]);
 
   const messagesEndRef = useRef(null);
   
-  const examplePrompts = [
-    'What are the most common web application vulnerabilities?',
-    'Explain the MITRE ATT&CK framework.',
-    'Write a python script to scan for open ports on a host.',
-    'How does a DDoS attack work and how can it be mitigated?'
-  ];
-
   // Load from localStorage on initial render
   useEffect(() => {
     try {
@@ -43,6 +60,12 @@ const LandingPage = () => {
       console.error("Failed to load from localStorage", error);
       startNewChat();
     }
+  }, []);
+
+  // Set random prompts on initial load
+  useEffect(() => {
+    const shuffled = allExamplePrompts.sort(() => 0.5 - Math.random());
+    setDisplayedPrompts(shuffled.slice(0, 4));
   }, []);
 
   // Save to localStorage whenever history or messages change
@@ -108,10 +131,12 @@ const LandingPage = () => {
 
     setWarningMessage(''); // Clear previous warnings
     let messageForDisplay = userMessage;
+    let isProfane = false;
 
     if (filter.isProfane(userMessage)) {
       messageForDisplay = filter.clean(userMessage);
       setWarningMessage('Inappropriate language detected and censored. Please be respectful.');
+      isProfane = true;
     }
 
     const currentMessages = allMessages[activeConversationId] || [];
@@ -132,7 +157,11 @@ const LandingPage = () => {
       const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: messageForDisplay, conversationId: activeConversationId }),
+        body: JSON.stringify({ 
+          message: messageForDisplay, 
+          conversationId: activeConversationId,
+          profanityDetected: isProfane
+        }),
       });
       const data = await response.json();
 
@@ -392,7 +421,7 @@ const LandingPage = () => {
             {allMessages[activeConversationId] && allMessages[activeConversationId].length < 2 && !isLoading && (
               <div className="welcome-enhancements">
                 <div className="example-prompts">
-                  {examplePrompts.map((prompt, i) => (
+                  {displayedPrompts.map((prompt, i) => (
                     <div key={i} className="prompt-card" onClick={() => handleSend(prompt)}>
                       <h4>{prompt}</h4>
                       <p>Click to send this prompt</p>
