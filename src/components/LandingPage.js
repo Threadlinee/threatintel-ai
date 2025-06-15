@@ -51,6 +51,7 @@ const filter = new Filter();const LandingPage = () => {
       localStorage.setItem('allMessages', JSON.stringify(allMessages));
     }
   }, [chatHistory, allMessages]);
+  
   const startNewChat = async () => {
     setIsLoading(true);
     try {
@@ -195,6 +196,20 @@ const filter = new Filter();const LandingPage = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [allMessages, activeConversationId]);
 
+  const handleCopy = (code, buttonId) => {
+    navigator.clipboard.writeText(code).then(() => {
+      const button = document.getElementById(buttonId);
+      if (button) {
+        button.textContent = 'Copied!';
+        setTimeout(() => {
+          button.textContent = 'Copy';
+        }, 2000);
+      }
+    }, (err) => {
+      console.error('Failed to copy code: ', err);
+    });
+  };
+
   const renderMessage = (text) => {
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
     const parts = [];
@@ -231,10 +246,14 @@ const filter = new Filter();const LandingPage = () => {
 
     return parts.map((part, index) => {
       if (part.type === 'code') {
+        const buttonId = `copy-btn-${Date.now()}-${index}`;
         return (
           <div key={index} className="code-block-container">
             <div className="code-block-header">
               <span>{part.language}</span>
+              <button id={buttonId} className="copy-code-button" onClick={() => handleCopy(part.content, buttonId)}>
+                Copy
+              </button>
             </div>
             <pre className="code-block">
               <code className={`language-${part.language}`}>
@@ -357,8 +376,8 @@ const filter = new Filter();const LandingPage = () => {
             >
               <span className="chat-title">{chat.title}</span>
               <button className="delete-chat-button" onClick={(e) => {
-                e.stopPropagation();
-                deleteChat(chat.id);
+                 e.stopPropagation();
+                 deleteChat(chat.id);
               }}>
                 &#x2715;
               </button>

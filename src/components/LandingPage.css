@@ -320,6 +320,7 @@ body {
   margin: 16px 0;
   overflow: hidden; /* To clip the children to the border-radius */
   background: var(--code-bg-container);
+  position: relative; /* For positioning the button */
 }
 
 .code-block-header {
@@ -329,6 +330,24 @@ body {
   font-size: 13px;
   font-family: 'Consolas', 'Monaco', monospace;
   border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.copy-code-button {
+  background: #fff;
+  border: 1px solid #ccc;
+  color: #333;
+  padding: 3px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+}
+
+.copy-code-button:hover {
+  background-color: #f0f0f0;
 }
 
 .code-block {
