@@ -336,18 +336,52 @@ body {
 }
 
 .copy-code-button {
-  background: #fff;
-  border: 1px solid #ccc;
-  color: #333;
-  padding: 3px 8px;
+  background: transparent;
+  border: none;
+  color: #888;
+  padding: 4px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 12px;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  position: relative;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .copy-code-button:hover {
-  background-color: #f0f0f0;
+  color: #333;
+}
+
+.copy-code-button .copy-text {
+  display: none;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.copy-code-button .copy-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-code-button.copied {
+  width: auto;
+  padding: 3px 8px;
+  background-color: #eaf6ec;
+  border: 1px solid #b8e0c2;
+}
+
+.copy-code-button.copied .copy-icon {
+  display: none;
+}
+
+.copy-code-button.copied .copy-text {
+  display: inline;
+  color: #28a745;
+  font-weight: 500;
 }
 
 .code-block {
