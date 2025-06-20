@@ -21,7 +21,7 @@ const filter = new Filter();const LandingPage = () => {
   
   const [animatedBotText, setAnimatedBotText] = useState("");
   const [isAnimating, setIsAnimating] = useState(false);
-  const animationSpeed = 12; // ms per character (fast)
+  const animationSpeed = 40; // ms per character (fast)
   
   // Load from localStorage on initial render
   useEffect(() => {
@@ -478,17 +478,7 @@ const filter = new Filter();const LandingPage = () => {
                 </div>
               </div>
             )}
-            {isLoading && (
-              <div className="message-wrapper bot">
-                <div className="message-content">
-                  <div className="typing-indicator-inline">
-                    <span className="dot"></span>
-                    <span className="dot"></span>
-                    <span className="dot"></span>
-                  </div>
-                </div>
-              </div>
-            )}
+            {isLoading && false /* removed typing indicator */}
             <div ref={messagesEndRef} />
           </div>
 
