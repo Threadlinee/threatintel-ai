@@ -583,4 +583,21 @@ body {
   .example-prompts {
     grid-template-columns: 1fr;
   }
+}
+
+.bot-typing-anim {
+  animation: bot-slide-in 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  left: 0;
+  opacity: 1;
+}
+@keyframes bot-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 } 

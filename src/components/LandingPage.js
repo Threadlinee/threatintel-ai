@@ -19,6 +19,10 @@ const filter = new Filter();const LandingPage = () => {
 
   const messagesEndRef = useRef(null);
   
+  const [animatedBotText, setAnimatedBotText] = useState("");
+  const [isAnimating, setIsAnimating] = useState(false);
+  const animationSpeed = 12; // ms per character (fast)
+  
   // Load from localStorage on initial render
   useEffect(() => {
     try {
@@ -210,7 +214,35 @@ const filter = new Filter();const LandingPage = () => {
     });
   };
 
-  const renderMessage = (text) => {
+  // Animate the latest bot message
+  useEffect(() => {
+    const messages = allMessages[activeConversationId] || [];
+    if (!messages.length) return;
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg.sender === "bot") {
+      setAnimatedBotText("");
+      setIsAnimating(true);
+      let i = 0;
+      const reveal = () => {
+        setAnimatedBotText(lastMsg.text.slice(0, i));
+        if (i < lastMsg.text.length) {
+          i += Math.max(2, Math.floor(lastMsg.text.length / 60)); // reveal in chunks for speed
+          setTimeout(reveal, animationSpeed);
+        } else {
+          setAnimatedBotText(lastMsg.text);
+          setIsAnimating(false);
+        }
+      };
+      reveal();
+    } else {
+      setAnimatedBotText("");
+      setIsAnimating(false);
+    }
+    // Only run when a new bot message is added
+    // eslint-disable-next-line
+  }, [allMessages, activeConversationId]);
+
+  const renderMessage = (text, animate = false) => {
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
     const parts = [];
     let lastIndex = 0;
@@ -277,9 +309,9 @@ const filter = new Filter();const LandingPage = () => {
           .replace(/\n/g, '<br />'); // Line breaks
 
         return (
-          <div 
-            key={index} 
-            className="message-text-content"
+          <div
+            key={index}
+            className={`message-text-content${animate ? ' bot-typing-anim' : ''}`}
             dangerouslySetInnerHTML={{ __html: formattedText }}
           />
         );
@@ -410,15 +442,23 @@ const filter = new Filter();const LandingPage = () => {
       <div className="main-content">
         <div className="chat-container">
           <div className="messages-container">
-            {(allMessages[activeConversationId] || []).map((msg, i) => (
-              <div key={i} className={`message-wrapper ${msg.sender}`}>
-                <div className="message-content">
-                  <div className="message-text">
-                    {renderMessage(msg.text)}
+            {(allMessages[activeConversationId] || []).map((msg, i, arr) => {
+              const isLatestBot =
+                msg.sender === "bot" &&
+                i === arr.length - 1 &&
+                isAnimating;
+              return (
+                <div key={i} className={`message-wrapper ${msg.sender}`}>
+                  <div className="message-content">
+                    <div className="message-text">
+                      {msg.sender === "bot" && isLatestBot
+                        ? renderMessage(animatedBotText, true)
+                        : renderMessage(msg.text)}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {allMessages[activeConversationId] && allMessages[activeConversationId].length < 2 && !isLoading && (
               <div className="welcome-enhancements">
                 <div className="example-prompts">
