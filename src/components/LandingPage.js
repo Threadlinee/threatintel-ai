@@ -355,6 +355,8 @@ const filter = new Filter();const LandingPage = () => {
     root.style.setProperty('--code-bg-container', '#F0F2F5');
     root.style.setProperty('--code-bg-header', '#E8EBF0');
     root.style.setProperty('--code-text-header', '#6c757d');
+    root.style.setProperty('--scrollbar-thumb', '#00FFFF');
+    root.style.setProperty('--scrollbar-track', '#2E3A59');
 
     switch (theme) {
       case 'indigo-mint':
@@ -368,6 +370,8 @@ const filter = new Filter();const LandingPage = () => {
         root.style.setProperty('--code-bg-container', '#252525');
         root.style.setProperty('--code-bg-header', '#333333');
         root.style.setProperty('--code-text-header', '#AAAAAA');
+        root.style.setProperty('--scrollbar-thumb', '#98FF98'); // mint
+        root.style.setProperty('--scrollbar-track', '#4B0082'); // indigo
         break;
       case 'teal-gold':
         root.style.setProperty('--primary-slate', '#008080'); // teal
@@ -380,6 +384,8 @@ const filter = new Filter();const LandingPage = () => {
         root.style.setProperty('--code-bg-container', '#1F1F7A');
         root.style.setProperty('--code-bg-header', '#2A2A9A');
         root.style.setProperty('--code-text-header', '#AABBDD');
+        root.style.setProperty('--scrollbar-thumb', '#FFD700'); // gold
+        root.style.setProperty('--scrollbar-track', '#008080'); // teal
         break;
       case 'slate-cyan': // This is the default theme
         // Already reset above, so no need to do anything here
@@ -395,6 +401,8 @@ const filter = new Filter();const LandingPage = () => {
         root.style.setProperty('--code-bg-container', '#EAEAEA');
         root.style.setProperty('--code-bg-header', '#DDDDDD');
         root.style.setProperty('--code-text-header', '#555555');
+        root.style.setProperty('--scrollbar-thumb', '#87CEEB'); // sky blue
+        root.style.setProperty('--scrollbar-track', '#6A0DAD'); // purple
         break;
       case 'dark-green-ivory':
         root.style.setProperty('--primary-slate', '#014421'); // dark green
@@ -407,6 +415,8 @@ const filter = new Filter();const LandingPage = () => {
         root.style.setProperty('--code-bg-container', '#A06529');
         root.style.setProperty('--code-bg-header', '#805020');
         root.style.setProperty('--code-text-header', '#EEDDCC');
+        root.style.setProperty('--scrollbar-thumb', '#FFFFF0'); // ivory
+        root.style.setProperty('--scrollbar-track', '#014421'); // dark green
         break;
       default:
         break;

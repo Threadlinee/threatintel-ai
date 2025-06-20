@@ -34,6 +34,8 @@
   --code-bg-container: #F0F2F5;
   --code-bg-header: #E8EBF0;
   --code-text-header: #6c757d;
+  --scrollbar-thumb: var(--accent-cyan);
+  --scrollbar-track: var(--primary-slate);
 }
 
 body {
@@ -600,4 +602,31 @@ body {
     opacity: 1;
     transform: translateX(0);
   }
+}
+
+/* Custom Scrollbar Styles */
+.custom-scrollbar,
+::-webkit-scrollbar {
+  width: 8px;
+  background: var(--scrollbar-track);
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 8px;
+  min-height: 40px;
+  transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00e0e0;
+}
+::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
+}
+
+/* For Firefox */
+.custom-scrollbar,
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
 } 
