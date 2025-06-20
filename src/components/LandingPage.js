@@ -242,6 +242,13 @@ const filter = new Filter();const LandingPage = () => {
     // eslint-disable-next-line
   }, [allMessages, activeConversationId]);
 
+  // Remove the 3-dot typing indicator and scroll during animation
+  useEffect(() => {
+    if (isAnimating && messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [animatedBotText, isAnimating]);
+
   const renderMessage = (text, animate = false) => {
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
     const parts = [];
