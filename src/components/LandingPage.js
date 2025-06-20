@@ -21,7 +21,7 @@ const filter = new Filter();const LandingPage = () => {
   
   const [animatedBotText, setAnimatedBotText] = useState("");
   const [isAnimating, setIsAnimating] = useState(false);
-  const animationSpeed = 40; // ms per character (fast)
+  const animationSpeed = 50; // ms per character (fast)
   
   // Load from localStorage on initial render
   useEffect(() => {
@@ -124,6 +124,12 @@ const filter = new Filter();const LandingPage = () => {
     const newMessages = [...currentMessages, { sender: 'user', text: messageForDisplay }];
     setAllMessages(prev => ({ ...prev, [activeConversationId]: newMessages }));
 
+    // Show 'Thinking...' bot message instantly before POST request
+    setAllMessages(prev => ({
+      ...prev,
+      [activeConversationId]: [...newMessages, { sender: 'bot', text: 'Thinking...' }]
+    }));
+
     if (!messageToSend) setInput('');
     setIsLoading(true);
 
@@ -147,10 +153,20 @@ const filter = new Filter();const LandingPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setAllMessages(prev => ({
-          ...prev,
-          [activeConversationId]: [...newMessages, { sender: 'bot', text: data.response }]
-        }));
+        // Replace the 'Thinking...' message with the real response and animate immediately
+        setAllMessages(prev => {
+          const msgs = prev[activeConversationId] || [];
+          // Replace last bot message
+          return {
+            ...prev,
+            [activeConversationId]: [
+              ...msgs.slice(0, -1),
+              { sender: 'bot', text: data.response }
+            ]
+          };
+        });
+        setIsAnimating(true);
+        setAnimatedBotText("");
       } else {
         throw new Error(data.error || 'Failed to get response from server.');
       }
