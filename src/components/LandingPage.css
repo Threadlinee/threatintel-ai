@@ -637,4 +637,22 @@ body {
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.attach-button {
+  background: transparent;
+  border: none;
+  color: var(--primary-slate);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  margin-right: 4px;
+}
+.attach-button:hover {
+  background: var(--primary-glow);
+  color: var(--accent-cyan);
 } 

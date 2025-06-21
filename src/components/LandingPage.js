@@ -23,6 +23,9 @@ const filter = new Filter();const LandingPage = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const animationSpeed = 50; // ms per character (fast)
   
+  const [attachedFile, setAttachedFile] = useState(null);
+  const fileInputRef = useRef(null);
+
   // Load from localStorage on initial render
   useEffect(() => {
     try {
@@ -423,6 +426,18 @@ const filter = new Filter();const LandingPage = () => {
     }
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setAttachedFile(file);
+    if (file) {
+      console.log('Selected file:', file);
+    }
+  };
+
+  const handleAttachClick = () => {
+    fileInputRef.current.click();
+  };
+
   return (
     <div className="app-container">
       <div className="sidebar">
@@ -523,6 +538,23 @@ const filter = new Filter();const LandingPage = () => {
                   className="message-input"
                   disabled={isLoading}
                   rows={1}
+                />
+                {/* File attachment button */}
+                <button
+                  type="button"
+                  className="attach-button"
+                  onClick={handleAttachClick}
+                  tabIndex={-1}
+                  style={{ marginRight: 8 }}
+                  aria-label="Attach file"
+                >
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.44 11.05l-9.19 9.19a5 5 0 0 1-7.07-7.07l9.19-9.19a3 3 0 0 1 4.24 4.24l-9.2 9.19a1 1 0 0 1-1.41-1.41l9.19-9.19"/></svg>
+                </button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  style={{ display: 'none' }}
+                  onChange={handleFileChange}
                 />
                 <button 
                   type="submit" 
