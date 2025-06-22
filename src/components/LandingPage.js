@@ -143,15 +143,18 @@ const filter = new Filter();const LandingPage = () => {
       ));
     }
     
+    const formData = new FormData();
+    formData.append('message', messageForDisplay);
+    formData.append('conversationId', activeConversationId);
+    formData.append('profanityDetected', isProfane);
+    if (attachedFile) {
+      formData.append('file', attachedFile);
+    }
+
     try {
       const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          message: messageForDisplay, 
-          conversationId: activeConversationId,
-          profanityDetected: isProfane
-        }),
+        body: formData,
       });
       const data = await response.json();
 
@@ -170,6 +173,7 @@ const filter = new Filter();const LandingPage = () => {
         });
         setIsAnimating(true);
         setAnimatedBotText("");
+        setAttachedFile(null); // clear after send
       } else {
         throw new Error(data.error || 'Failed to get response from server.');
       }
@@ -524,6 +528,31 @@ const filter = new Filter();const LandingPage = () => {
           </div>
 
           <div className="input-container">
+            {attachedFile && (
+              <div className="file-preview">
+                {attachedFile.type.startsWith('image/') ? (
+                  <img
+                    src={URL.createObjectURL(attachedFile)}
+                    alt="preview"
+                    style={{ maxWidth: 120, maxHeight: 120, borderRadius: 8, marginBottom: 8 }}
+                  />
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span role="img" aria-label="file" style={{ fontSize: 32 }}>
+                      {attachedFile.type === 'application/pdf' ? '📄' : attachedFile.type.includes('presentation') ? '📊' : '📎'}
+                    </span>
+                    <span>{attachedFile.name}</span>
+                  </div>
+                )}
+                <button
+                  className="remove-file-btn"
+                  onClick={() => setAttachedFile(null)}
+                  style={{ marginTop: 4 }}
+                >
+                  Remove
+                </button>
+              </div>
+            )}
             <form onSubmit={e => {
               e.preventDefault();
               handleSend();
