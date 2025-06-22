@@ -111,7 +111,7 @@ const filter = new Filter();const LandingPage = () => {
 
   const handleSend = async (messageToSend) => {
     const userMessage = messageToSend || input;
-    if (!userMessage.trim() || !activeConversationId) return;
+    if (!userMessage.trim() && !attachedFile) return;
 
     setWarningMessage(''); // Clear previous warnings
     let messageForDisplay = userMessage;
@@ -125,6 +125,18 @@ const filter = new Filter();const LandingPage = () => {
 
     const currentMessages = allMessages[activeConversationId] || [];
     const newMessages = [...currentMessages, { sender: 'user', text: messageForDisplay }];
+
+    // Add file message (if any)
+    if (attachedFile) {
+      newMessages.push({
+        sender: 'user',
+        file: {
+          name: attachedFile.name,
+          type: attachedFile.type,
+          url: URL.createObjectURL(attachedFile)
+        }
+      });
+    }
     setAllMessages(prev => ({ ...prev, [activeConversationId]: newMessages }));
 
     // Show 'Thinking...' bot message instantly before POST request
@@ -272,7 +284,23 @@ const filter = new Filter();const LandingPage = () => {
     }
   }, [animatedBotText, isAnimating]);
 
-  const renderMessage = (text, animate = false) => {
+  const renderMessage = (text, animate = false, file = null) => {
+    if (file) {
+      if (file.type.startsWith('image/')) {
+        return (
+          <img src={file.url} alt={file.name} style={{ maxWidth: 180, borderRadius: 8 }} />
+        );
+      } else {
+        return (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span role="img" aria-label="file" style={{ fontSize: 28 }}>
+              {file.type === 'application/pdf' ? '📄' : file.type.includes('presentation') ? '📊' : '📎'}
+            </span>
+            <span>{file.name}</span>
+          </div>
+        );
+      }
+    }
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
     const parts = [];
     let lastIndex = 0;
@@ -503,9 +531,11 @@ const filter = new Filter();const LandingPage = () => {
                 <div key={i} className={`message-wrapper ${msg.sender}`}>
                   <div className="message-content">
                     <div className="message-text">
-                      {msg.sender === "bot" && isLatestBot
-                        ? renderMessage(animatedBotText, true)
-                        : renderMessage(msg.text)}
+                      {msg.file
+                        ? renderMessage(null, false, msg.file)
+                        : (msg.sender === "bot" && isLatestBot
+                            ? renderMessage(animatedBotText, true)
+                            : renderMessage(msg.text))}
                     </div>
                   </div>
                 </div>
