@@ -9,6 +9,8 @@ import Modal from 'react-modal';
 const filter = new Filter();
 const CODE_EDIT_KEY = 'editedCodeBlocks';
 
+const getEditKey = (conversationId) => `editedCodeBlocks_${conversationId}`;
+
 Modal.setAppElement('#root');
 
 const LandingPage = () => {
@@ -34,14 +36,7 @@ const LandingPage = () => {
   const [attachedFile, setAttachedFile] = useState(null);
   const fileInputRef = useRef(null);
 
-  const [editingCode, setEditingCode] = useState({});
-  const [editedCode, setEditedCode] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem(CODE_EDIT_KEY)) || {};
-    } catch {
-      return {};
-    }
-  });
+  const [editedCode, setEditedCode] = useState({});
   const [modalOpen, setModalOpen] = useState(false);
   const [modalCode, setModalCode] = useState('');
   const [modalLang, setModalLang] = useState('');
@@ -80,10 +75,23 @@ const LandingPage = () => {
     }
   }, [chatHistory, allMessages]);
   
+  // Load edited code for the active conversation
   useEffect(() => {
-    localStorage.setItem(CODE_EDIT_KEY, JSON.stringify(editedCode));
-  }, [editedCode]);
-  
+    if (!activeConversationId) return;
+    try {
+      const loaded = JSON.parse(localStorage.getItem(getEditKey(activeConversationId))) || {};
+      setEditedCode(loaded);
+    } catch {
+      setEditedCode({});
+    }
+  }, [activeConversationId]);
+
+  // Save edits for the active conversation
+  useEffect(() => {
+    if (!activeConversationId) return;
+    localStorage.setItem(getEditKey(activeConversationId), JSON.stringify(editedCode));
+  }, [editedCode, activeConversationId]);
+
   const startNewChat = async () => {
     setIsLoading(true);
     try {
@@ -124,6 +132,7 @@ const LandingPage = () => {
       delete newMessages[idToDelete];
       return newMessages;
     });
+    localStorage.removeItem(getEditKey(idToDelete));
 
     if (activeConversationId === idToDelete) {
       if (remainingChats.length > 0) {
