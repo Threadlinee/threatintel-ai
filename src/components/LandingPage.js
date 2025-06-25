@@ -693,7 +693,7 @@ const LandingPage = () => {
             className="code-edit-textarea"
             value={modalCode}
             onChange={e => setModalCode(e.target.value)}
-            style={{ width: '100%', minHeight: 220, fontFamily: 'Fira Code, Consolas, monospace', fontSize: 15, borderRadius: 10, padding: 14, border: '1px solid #e5e7eb', background: '#181818', color: '#fff', marginBottom: 18 }}
+            style={{ width: '100%', minHeight: 350, fontFamily: 'Fira Code, Consolas, monospace', fontSize: 15, borderRadius: 10, padding: 14, border: '1px solid #e5e7eb', background: '#181818', color: '#fff', marginBottom: 18 }}
           />
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
             <button className="crazy-modal-btn" onClick={saveEditModal}>Save</button>

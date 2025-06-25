@@ -684,7 +684,7 @@ body {
 
 .code-edit-textarea {
   width: 100%;
-  min-height: 320px;
+  min-height: 350px;
   font-family: 'Fira Code', 'Consolas', monospace;
   font-size: 16px;
   border-radius: 10px;
@@ -715,8 +715,8 @@ body {
   border-radius: 18px;
   box-shadow: 0 8px 40px 0 #00ffff55, 0 1.5px 8px #000;
   padding: 48px 40px 32px 40px;
-  max-width: 900px;
-  width: 98vw;
+  max-width: 1200px;
+  width: 100vw;
   outline: none;
   animation: crazyPopIn 0.5s cubic-bezier(0.68,-0.55,0.27,1.55);
   position: relative;
