@@ -2,8 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Filter } from 'bad-words';
 import './LandingPage.css';
 import { allExamplePrompts } from '../data/prompts';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github-dark.css';
 
-const filter = new Filter();const LandingPage = () => {
+const filter = new Filter();
+const LandingPage = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [showAppearance, setShowAppearance] = useState(false);
@@ -313,13 +316,11 @@ const filter = new Filter();const LandingPage = () => {
           content: text.slice(lastIndex, match.index)
         });
       }
-      
       parts.push({
         type: 'code',
-        language: match[1] || 'text',
+        language: match[1] || 'plaintext',
         content: match[2]
       });
-      
       lastIndex = match.index + match[0].length;
     }
 
@@ -337,6 +338,8 @@ const filter = new Filter();const LandingPage = () => {
     return parts.map((part, index) => {
       if (part.type === 'code') {
         const buttonId = `copy-btn-${Date.now()}-${index}`;
+        // Highlight code using highlight.js
+        const highlighted = hljs.highlight(part.content, { language: part.language, ignoreIllegals: true }).value;
         return (
           <div key={index} className="code-block-container">
             <div className="code-block-header">
@@ -352,28 +355,25 @@ const filter = new Filter();const LandingPage = () => {
               </button>
             </div>
             <pre className="code-block">
-              <code className={`language-${part.language}`}>
-                {part.content}
-              </code>
+              <code className={`language-${part.language}`} dangerouslySetInnerHTML={{ __html: highlighted }} />
             </pre>
           </div>
         );
-      } else {
-        let formattedText = part.content
-          .replace(/^### (.*)$/gm, '<strong>$1</strong>') // Convert ### headers to bold
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
-          .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
-          .replace(/`(.*?)`/g, '<code class="inline-code">$1</code>') // Inline code
-          .replace(/\n/g, '<br />'); // Line breaks
-
-        return (
-          <div
-            key={index}
-            className={`message-text-content${animate ? ' bot-typing-anim' : ''}`}
-            dangerouslySetInnerHTML={{ __html: formattedText }}
-          />
-        );
       }
+      let formattedText = part.content
+        .replace(/^### (.*)$/gm, '<strong>$1</strong>') // Convert ### headers to bold
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
+        .replace(/\*(.*?)\*/g, '<em>$1</em>') // Italic
+        .replace(/`(.*?)`/g, '<code class="inline-code">$1</code>') // Inline code
+        .replace(/\n/g, '<br />'); // Line breaks
+
+      return (
+        <div
+          key={index}
+          className={`message-text-content${animate ? ' bot-typing-anim' : ''}`}
+          dangerouslySetInnerHTML={{ __html: formattedText }}
+        />
+      );
     });
   };
 
