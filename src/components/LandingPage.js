@@ -29,6 +29,9 @@ const LandingPage = () => {
   const [attachedFile, setAttachedFile] = useState(null);
   const fileInputRef = useRef(null);
 
+  const [editingCode, setEditingCode] = useState({}); // Track which code blocks are being edited
+  const [editedCode, setEditedCode] = useState({}); // Store edited code per block
+
   // Load from localStorage on initial render
   useEffect(() => {
     try {
@@ -287,7 +290,7 @@ const LandingPage = () => {
     }
   }, [animatedBotText, isAnimating]);
 
-  const renderMessage = (text, animate = false, file = null) => {
+  const renderMessage = (text, animate = false, file = null, msgIdx = null) => {
     if (file) {
       if (file.type.startsWith('image/')) {
         return (
@@ -338,20 +341,39 @@ const LandingPage = () => {
     return parts.map((part, index) => {
       if (part.type === 'code') {
         const buttonId = `copy-btn-${Date.now()}-${index}`;
-        // Highlight code using highlight.js
+        const codeKey = `${msgIdx || 0}-${index}`;
+        if (editingCode[codeKey]) {
+          return (
+            <div key={index} className="code-block-container">
+              <div className="code-block-header">
+                <span>{part.language} (editing)</span>
+                <button className="copy-code-button" onClick={() => setEditingCode(e => ({ ...e, [codeKey]: false }))}>
+                  Cancel
+                </button>
+                <button className="copy-code-button" onClick={() => { setEditingCode(e => ({ ...e, [codeKey]: false })); part.content = editedCode[codeKey] || part.content; }}>
+                  Save
+                </button>
+              </div>
+              <textarea
+                className="code-edit-textarea"
+                value={editedCode[codeKey] !== undefined ? editedCode[codeKey] : part.content}
+                onChange={e => setEditedCode(ed => ({ ...ed, [codeKey]: e.target.value }))}
+                style={{ width: '100%', minHeight: 120, fontFamily: 'monospace', fontSize: 14, borderRadius: 8, padding: 10, border: '1px solid #e5e7eb', marginTop: 0 }}
+              />
+            </div>
+          );
+        }
         const highlighted = hljs.highlight(part.content, { language: part.language, ignoreIllegals: true }).value;
         return (
           <div key={index} className="code-block-container">
             <div className="code-block-header">
               <span>{part.language}</span>
               <button id={buttonId} className="copy-code-button" onClick={() => handleCopy(part.content, buttonId)}>
-                <span className="copy-icon">
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M10.75 4.75H4.25C3.83579 4.75 3.5 5.08579 3.5 5.5V12.5C3.5 12.9142 3.83579 13.25 4.25 13.25H10.75C11.1642 13.25 11.5 12.9142 11.5 12.5V5.5C11.5 5.08579 11.1642 4.75 10.75 4.75Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M7.5 4.75V3.75C7.5 3.19772 7.94772 2.75 8.5 2.75H12.5C13.0523 2.75 13.5 3.19772 13.5 3.75V10.25C13.5 10.8023 13.0523 11.25 12.5 11.25H11.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                </span>
+                <span className="copy-icon">📋</span>
                 <span className="copy-text">Copied!</span>
+              </button>
+              <button className="copy-code-button" onClick={() => setEditingCode(e => ({ ...e, [codeKey]: true }))}>
+                Edit
               </button>
             </div>
             <pre className="code-block">
@@ -532,10 +554,10 @@ const LandingPage = () => {
                   <div className="message-content">
                     <div className="message-text">
                       {msg.file
-                        ? renderMessage(null, false, msg.file)
+                        ? renderMessage(null, false, msg.file, i)
                         : (msg.sender === "bot" && isLatestBot
-                            ? renderMessage(animatedBotText, true)
-                            : renderMessage(msg.text))}
+                            ? renderMessage(animatedBotText, true, null, i)
+                            : renderMessage(msg.text, false, null, i))}
                     </div>
                   </div>
                 </div>

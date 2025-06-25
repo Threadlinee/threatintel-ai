@@ -680,4 +680,21 @@ body {
 }
 .remove-file-btn:hover {
   background: #d9363e;
+}
+
+.code-edit-textarea {
+  width: 100%;
+  min-height: 120px;
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 14px;
+  border-radius: 8px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  margin-top: 0;
+  background: #f8f9fa;
+  color: #222;
+  resize: vertical;
+}
+.code-block-header .copy-code-button {
+  margin-left: 8px;
 } 
