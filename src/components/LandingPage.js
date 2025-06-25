@@ -4,8 +4,13 @@ import './LandingPage.css';
 import { allExamplePrompts } from '../data/prompts';
 import hljs from 'highlight.js';
 import 'highlight.js/styles/github-dark.css';
+import Modal from 'react-modal';
 
 const filter = new Filter();
+const CODE_EDIT_KEY = 'editedCodeBlocks';
+
+Modal.setAppElement('#root');
+
 const LandingPage = () => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -29,8 +34,18 @@ const LandingPage = () => {
   const [attachedFile, setAttachedFile] = useState(null);
   const fileInputRef = useRef(null);
 
-  const [editingCode, setEditingCode] = useState({}); // Track which code blocks are being edited
-  const [editedCode, setEditedCode] = useState({}); // Store edited code per block
+  const [editingCode, setEditingCode] = useState({});
+  const [editedCode, setEditedCode] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(CODE_EDIT_KEY)) || {};
+    } catch {
+      return {};
+    }
+  });
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalCode, setModalCode] = useState('');
+  const [modalLang, setModalLang] = useState('');
+  const [modalKey, setModalKey] = useState('');
 
   // Load from localStorage on initial render
   useEffect(() => {
@@ -64,6 +79,10 @@ const LandingPage = () => {
       localStorage.setItem('allMessages', JSON.stringify(allMessages));
     }
   }, [chatHistory, allMessages]);
+  
+  useEffect(() => {
+    localStorage.setItem(CODE_EDIT_KEY, JSON.stringify(editedCode));
+  }, [editedCode]);
   
   const startNewChat = async () => {
     setIsLoading(true);
@@ -290,6 +309,23 @@ const LandingPage = () => {
     }
   }, [animatedBotText, isAnimating]);
 
+  const openEditModal = (code, codeKey, language) => {
+    setModalCode(code);
+    setModalLang(language);
+    setModalKey(codeKey);
+    setModalOpen(true);
+  };
+  const closeEditModal = () => {
+    setModalOpen(false);
+    setModalCode('');
+    setModalLang('');
+    setModalKey('');
+  };
+  const saveEditModal = () => {
+    setEditedCode(ed => ({ ...ed, [modalKey]: modalCode }));
+    closeEditModal();
+  };
+
   const renderMessage = (text, animate = false, file = null, msgIdx = null) => {
     if (file) {
       if (file.type.startsWith('image/')) {
@@ -340,41 +376,23 @@ const LandingPage = () => {
 
     return parts.map((part, index) => {
       if (part.type === 'code') {
-        const buttonId = `copy-btn-${Date.now()}-${index}`;
+        const buttonId = `copy-btn-${msgIdx || 0}-${index}`;
         const codeKey = `${msgIdx || 0}-${index}`;
-        if (editingCode[codeKey]) {
-          return (
-            <div key={index} className="code-block-container">
-              <div className="code-block-header">
-                <span>{part.language} (editing)</span>
-                <button className="copy-code-button" onClick={() => setEditingCode(e => ({ ...e, [codeKey]: false }))}>
-                  Cancel
-                </button>
-                <button className="copy-code-button" onClick={() => { setEditingCode(e => ({ ...e, [codeKey]: false })); part.content = editedCode[codeKey] || part.content; }}>
-                  Save
-                </button>
-              </div>
-              <textarea
-                className="code-edit-textarea"
-                value={editedCode[codeKey] !== undefined ? editedCode[codeKey] : part.content}
-                onChange={e => setEditedCode(ed => ({ ...ed, [codeKey]: e.target.value }))}
-                style={{ width: '100%', minHeight: 120, fontFamily: 'monospace', fontSize: 14, borderRadius: 8, padding: 10, border: '1px solid #e5e7eb', marginTop: 0 }}
-              />
-            </div>
-          );
-        }
-        const highlighted = hljs.highlight(part.content, { language: part.language, ignoreIllegals: true }).value;
+        const codeToShow = editedCode[codeKey] !== undefined ? editedCode[codeKey] : part.content;
+        const highlighted = hljs.highlight(codeToShow, { language: part.language, ignoreIllegals: true }).value;
         return (
           <div key={index} className="code-block-container">
-            <div className="code-block-header">
-              <span>{part.language}</span>
-              <button id={buttonId} className="copy-code-button" onClick={() => handleCopy(part.content, buttonId)}>
-                <span className="copy-icon">📋</span>
-                <span className="copy-text">Copied!</span>
-              </button>
-              <button className="copy-code-button" onClick={() => setEditingCode(e => ({ ...e, [codeKey]: true }))}>
-                Edit
-              </button>
+            <div className="code-block-header" style={{ justifyContent: 'space-between' }}>
+              <span style={{ flex: 1, textAlign: 'left' }}>{part.language}</span>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <button id={buttonId} className="copy-code-button" onClick={() => handleCopy(codeToShow, buttonId)}>
+                  <span className="copy-icon">📋</span>
+                  <span className="copy-text">Copied!</span>
+                </button>
+                <button className="copy-code-button" onClick={() => openEditModal(codeToShow, codeKey, part.language)}>
+                  Edit
+                </button>
+              </div>
             </div>
             <pre className="code-block">
               <code className={`language-${part.language}`} dangerouslySetInnerHTML={{ __html: highlighted }} />
@@ -653,6 +671,27 @@ const LandingPage = () => {
           </div>
         </div>
       </div>
+      <Modal
+        isOpen={modalOpen}
+        onRequestClose={closeEditModal}
+        className="crazy-modal"
+        overlayClassName="crazy-modal-overlay"
+        closeTimeoutMS={500}
+      >
+        <div className="crazy-modal-content">
+          <h2 style={{ marginBottom: 12 }}>{modalLang} Code Editor</h2>
+          <textarea
+            className="code-edit-textarea"
+            value={modalCode}
+            onChange={e => setModalCode(e.target.value)}
+            style={{ width: '100%', minHeight: 220, fontFamily: 'Fira Code, Consolas, monospace', fontSize: 15, borderRadius: 10, padding: 14, border: '1px solid #e5e7eb', background: '#181818', color: '#fff', marginBottom: 18 }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12 }}>
+            <button className="crazy-modal-btn" onClick={saveEditModal}>Save</button>
+            <button className="crazy-modal-btn" onClick={closeEditModal}>Cancel</button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

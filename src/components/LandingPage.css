@@ -684,17 +684,81 @@ body {
 
 .code-edit-textarea {
   width: 100%;
-  min-height: 120px;
+  min-height: 320px;
   font-family: 'Fira Code', 'Consolas', monospace;
-  font-size: 14px;
-  border-radius: 8px;
-  padding: 10px;
+  font-size: 16px;
+  border-radius: 10px;
+  padding: 18px;
   border: 1px solid #e5e7eb;
   margin-top: 0;
-  background: #f8f9fa;
-  color: #222;
+  background: var(--background-light);
+  color: var(--text);
   resize: vertical;
 }
 .code-block-header .copy-code-button {
   margin-left: 8px;
+}
+
+.crazy-modal-overlay {
+  background: rgba(0,0,0,0.7);
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: crazyFadeIn 0.5s cubic-bezier(0.68,-0.55,0.27,1.55);
+}
+.crazy-modal {
+  background: var(--background-white);
+  color: var(--text);
+  border-radius: 18px;
+  box-shadow: 0 8px 40px 0 #00ffff55, 0 1.5px 8px #000;
+  padding: 48px 40px 32px 40px;
+  max-width: 900px;
+  width: 98vw;
+  outline: none;
+  animation: crazyPopIn 0.5s cubic-bezier(0.68,-0.55,0.27,1.55);
+  position: relative;
+}
+.crazy-modal-content {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  animation: crazyWobble 1.2s infinite alternate ease-in-out;
+}
+.crazy-modal-btn {
+  background: #00FFFF;
+  color: var(--primary-slate);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: 0;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.2s;
+  box-shadow: 0 2px 8px #00ffff33;
+}
+.crazy-modal-btn:hover {
+  background: #00e0e0;
+  color: #111;
+  transform: scale(1.07) rotate(-2deg);
+}
+@keyframes crazyPopIn {
+  0% { transform: scale(0.7) rotate(-8deg); opacity: 0; }
+  60% { transform: scale(1.1) rotate(4deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes crazyFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes crazyWobble {
+  0% { transform: rotate(-1deg); }
+  100% { transform: rotate(1deg); }
+}
+.code-block-header span {
+  text-align: left !important;
 } 
