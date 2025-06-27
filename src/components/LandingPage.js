@@ -662,6 +662,7 @@ const LandingPage = () => {
                   className="message-input"
                   disabled={isLoading}
                   rows={1}
+                  style={{ paddingRight: 18 }}
                 />
                 {/* File attachment button */}
                 <button

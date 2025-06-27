@@ -475,6 +475,28 @@ body {
   color: #828a99;
 }
 
+.message-input::-webkit-scrollbar {
+  width: 8px;
+  background: #f4f6fa; /* lighter than textarea bg */
+  border-radius: 6px;
+}
+.message-input::-webkit-scrollbar-thumb {
+  background: #e0e6ef; /* light thumb */
+  border-radius: 6px;
+}
+.message-input::-webkit-scrollbar-thumb:hover {
+  background: #cfd8e3;
+}
+.message-input::-webkit-scrollbar-corner {
+  background: #f4f6fa;
+}
+
+/* For Firefox */
+.message-input {
+  scrollbar-width: thin;
+  scrollbar-color: #e0e6ef #f4f6fa;
+}
+
 .send-button {
   background: var(--accent-cyan);
   border: none;
