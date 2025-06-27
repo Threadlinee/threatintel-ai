@@ -18,6 +18,7 @@ const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [showAppearance, setShowAppearance] = useState(false);
   const [warningMessage, setWarningMessage] = useState('');
+  const [lineLimitWarning, setLineLimitWarning] = useState("");
 
   const textareaRef = useRef(null);
 
@@ -145,9 +146,25 @@ const LandingPage = () => {
     }
   };
 
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    const lineCount = value.split("\n").length;
+    if (lineCount > 5000) {
+      setLineLimitWarning("You can only enter up to 5000 lines of code or text.");
+      return;
+    } else {
+      setLineLimitWarning("");
+    }
+    setInput(value);
+  };
+
   const handleSend = async (messageToSend) => {
     const userMessage = messageToSend || input;
     if (!userMessage.trim() && !attachedFile) return;
+    if (userMessage.split("\n").length > 5000) {
+      setLineLimitWarning("You can only enter up to 5000 lines of code or text.");
+      return;
+    }
 
     setWarningMessage(''); // Clear previous warnings
     let messageForDisplay = userMessage;
@@ -656,7 +673,7 @@ const LandingPage = () => {
                 <textarea
                   ref={textareaRef}
                   value={input}
-                  onChange={e => setInput(e.target.value)}
+                  onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
                   placeholder="Ask anything about cybersecurity..."
                   className="message-input"
@@ -693,6 +710,7 @@ const LandingPage = () => {
                 </button>
               </div>
               {warningMessage && <p className="warning-message">{warningMessage}</p>}
+              {lineLimitWarning && <p className="warning-message">{lineLimitWarning}</p>}
             </form>
           </div>
         </div>
