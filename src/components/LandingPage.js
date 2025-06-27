@@ -352,11 +352,12 @@ const LandingPage = () => {
         );
       }
     }
+    // Modified: Always render partial code blocks live
     const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g;
+    const partialCodeBlockRegex = /```(\w+)?\n([\s\S]*)$/;
     const parts = [];
     let lastIndex = 0;
     let match;
-
     while ((match = codeBlockRegex.exec(text)) !== null) {
       if (match.index > lastIndex) {
         parts.push({
@@ -371,23 +372,36 @@ const LandingPage = () => {
       });
       lastIndex = match.index + match[0].length;
     }
-
+    // --- LIVE CODE BLOCK RENDERING ---
+    // If there is a partial code block at the end (not closed), render it as code
+    // This ensures that as soon as the bot starts outputting a code block (with ```),
+    // the code block design and syntax highlighting appear live, even before the code is finished.
+    const partialMatch = partialCodeBlockRegex.exec(text.slice(lastIndex));
+    if (partialMatch) {
+      if (partialMatch.index > 0) {
+        parts.push({ type: 'text', content: text.slice(lastIndex, lastIndex + partialMatch.index) });
+      }
+      parts.push({
+        type: 'code',
+        language: partialMatch[1] || 'plaintext',
+        content: partialMatch[2] || '' // Ensure content is always defined
+      });
+      lastIndex = text.length;
+    }
     if (lastIndex < text.length) {
       parts.push({
         type: 'text',
         content: text.slice(lastIndex)
       });
     }
-
     if (parts.length === 0) {
       parts.push({ type: 'text', content: text });
     }
-
     return parts.map((part, index) => {
       if (part.type === 'code') {
         const buttonId = `copy-btn-${msgIdx || 0}-${index}`;
         const codeKey = `${msgIdx || 0}-${index}`;
-        const codeToShow = editedCode[codeKey] !== undefined ? editedCode[codeKey] : part.content;
+        const codeToShow = editedCode && editedCode[codeKey] !== undefined ? editedCode[codeKey] : part.content;
         const highlighted = hljs.highlight(codeToShow, { language: part.language, ignoreIllegals: true }).value;
         return (
           <div key={index} className="code-block-container">
