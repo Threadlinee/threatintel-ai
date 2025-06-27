@@ -94,6 +94,7 @@ const LandingPage = () => {
 
   const startNewChat = async () => {
     setIsLoading(true);
+    setInput('');
     try {
       const response = await fetch(`${process.env.REACT_APP_BASE_URL}/api/chat/new`, { method: 'POST' });
       if (!response.ok) {
@@ -121,6 +122,7 @@ const LandingPage = () => {
   
   const selectChat = (id) => {
     setActiveConversationId(id);
+    setInput('');
   };
   
   const deleteChat = (idToDelete) => {
